@@ -1,27 +1,59 @@
-import { Grid } from '@mui/material'
-import React from 'react'
-import { hasImgAndLinkField } from '../../utils/getUnknowField';
-import { Link } from 'react-router-dom';
+import { Alert, Grid, Snackbar } from '@mui/material'
+import React, { useState } from 'react'
+import { hasVariablesFields } from '../../utils/getUnknowField';
+import VideoCard from '../VideoCard/VideoCard';
 
 interface IVideoList {
   title: string;
-  array?: unknown[];
+  array: unknown[];
 }
 
-const mock = new Array(16).fill({ img: 'https://marisakantor.com.ar/wp-content/uploads/2019/10/01-Responsive-Website.jpg', id: 1 })
+interface IdAImgATitle {
+  id: number;
+  img: string;
+  title: string;
+}
 
-const VideoList = ({ title, array = mock }: IVideoList) => {
+const VideoList = ({ title, array }: IVideoList) => {
+  const [isSave, setSave] = useState(false)
+  const [isDelete, setDelete] = useState(false)
+
+  const handleClose = () => {
+    isSave && setSave(false)
+    isDelete && setDelete(false)
+  }
+  const saveFunction = () => {
+    setSave(true)
+  }
+
+  const deleteFunction = () => {
+    setDelete(true)
+  }
+
   return (
-    <Grid container direction='row' justifyContent='center' marginTop={3}>
+    <Grid container direction='row' justifyContent='center' marginTop={3} marginLeft='auto' marginRight='auto'>
       <h2>{title}</h2>
-      <Grid container sx={{ marginTop: 2 }} spacing={1} gap={1} justifyContent='center'>
+      <Grid container sx={{ marginTop: 2 }} spacing={1} justifyContent='space-between'>
         {array.map((el, i) =>
-          hasImgAndLinkField(el) &&
-          <Grid item xs={3}>
-            <Link to={'/video/' + el.id}><img src={el.img} alt={'статья ' + i} style={{ maxWidth: '100%' }} /></Link>
+          hasVariablesFields<IdAImgATitle>(el, {field: 'id', type: 'number'}, {field: 'img', type: 'string'}, {field: 'title', type: 'string'}) &&
+          <Grid key={'grid-container-state' + i} item xs={3}>
+            <VideoCard deleteFunction={deleteFunction}  saveFunction={saveFunction} id={el.id} img={el.img} text={'fasfasfasfgasgagagagasgasgadsgadsfgaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'} title={el.title} key={'статья ' + i} />
           </Grid>
         )}
       </Grid>
+
+      <Snackbar open={isSave} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          Сохранено для прочтения!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar open={isDelete} autoHideDuration={3000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity="success">
+          Удалено из избранного!
+        </Alert>
+      </Snackbar>
+
     </Grid>
   )
 }
