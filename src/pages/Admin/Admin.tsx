@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styles from './style.module.css'
 import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material'
 import EditForm from '../../components/UI/EditForm/EditForm'
@@ -6,8 +6,11 @@ import EditForm from '../../components/UI/EditForm/EditForm'
 const mock = new Array(16).fill({ img: 'https://marisakantor.com.ar/wp-content/uploads/2019/10/01-Responsive-Website.jpg', id: 1, title: '123321' })
 
 const Admin = () => {
+  const [isModal, setIsModal] = useState(false)
+
   return (
     <>
+      <Button variant='contained' sx={{margin: '10px 0'}}>Создать запись</Button>
       <TableContainer component={Paper}>
         <Table size="small" aria-label="a dense table">
           <TableHead>
@@ -33,7 +36,7 @@ const Admin = () => {
         </Table>
       </TableContainer>
 
-      <EditForm open={true} setOpen={() => 1} />
+      <EditForm open={isModal} setOpen={setIsModal} />
     </>
   )
 }
