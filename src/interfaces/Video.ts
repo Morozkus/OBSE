@@ -5,5 +5,14 @@ export interface IVideo {
   videoLink: string;
   title: string;
   img: string;
-  likes: number;
+  likes?: number;
+}
+
+export interface IVideoFromSB {
+  id: number;
+  details: IDetails[];
+  videoLink: string;
+  title: string;
+  img: string;
+  user_id: string;
 }

@@ -11,13 +11,12 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
-import { forwardRef, useCallback, useEffect } from 'react';
+import { forwardRef } from 'react';
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { IVideo } from '../../../interfaces/Video';
 import { FormControl, InputLabel, OutlinedInput, TextField } from '@mui/material';
-import { IDetails } from '../../../interfaces/Details';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux';
-import { getAllVideos, getIdVideo, updateVideo } from '../../../store/actions/VideoActions';
+import { createVideo } from '../../../store/actions/VideoActions';
 
 const Transition = forwardRef(function Transition(
   props: TransitionProps & {
@@ -30,24 +29,24 @@ const Transition = forwardRef(function Transition(
 
 interface IEditForm {
   open: boolean;
-  setOpen: () => void;
-  id: undefined | number;
+  setOpen: () => void
 }
 
 // const mock = new Array<IDetails>(16).fill({ title: '123321', paragraphs: 'fasfafasfasfasfaf' })
 
 
-export default function EditForm({ open, setOpen, id }: IEditForm) {
-  const { videoById } = useAppSelector(state => state.video)
+export default function AddForm({ open, setOpen }: IEditForm) {
+  const { id } = useAppSelector(state => state.user)
   const dispatch = useAppDispatch()
 
   const { control, handleSubmit, register } = useForm<IVideo>({
-    values: {
-      title: videoById?.title ?? '',
-      videoLink: videoById?.videoLink ?? '',
-      img: videoById?.img ?? '',
+    defaultValues: {
+      title: '',
+      videoLink: '',
+      img: '',
       details: []
-    }
+    },
+    mode: 'onSubmit'
   })
 
   const { fields, append, remove } = useFieldArray({
@@ -60,32 +59,17 @@ export default function EditForm({ open, setOpen, id }: IEditForm) {
     setOpen();
   };
 
-  const handleAddField = useCallback((details: IDetails | IDetails[]) => {
-    append(details)
-  }, [append])
+  const handleAddField = () => {
+    append({ paragraphs: '', title: '' })
+  }
 
-  const submit: SubmitHandler<IVideo> = async (data) => {
-    if (id) {
-      await dispatch(updateVideo({ videoInfo: { title: data.title, details: data.details, img: data.img, videoLink: data.videoLink }, id: id }))
-      await dispatch(getAllVideos())
-    }
+  const submit: SubmitHandler<IVideo> = (data) => {
+    dispatch(createVideo({ userId: id, videoInfo: { title: data.title, details: data.details, img: data.img, videoLink: data.videoLink } }))
     handleClose()
   }
 
-  useEffect(() => {
-    if (id) {
-      dispatch(getIdVideo(id))
-    }
-  }, [dispatch, id])
-
-  useEffect(() => {
-    if (videoById) {
-      handleAddField(videoById.details)
-    }
-  }, [handleAddField, videoById])
-
   return (
-    <>
+    <form>
       <Dialog
         fullScreen
         open={open}
@@ -106,7 +90,7 @@ export default function EditForm({ open, setOpen, id }: IEditForm) {
               Видео
             </Typography>
 
-            <Button autoFocus color="inherit" onClick={() => handleAddField({ paragraphs: '', title: '' })}>
+            <Button autoFocus color="inherit" onClick={handleAddField}>
               Добавить поле
             </Button>
 
@@ -116,7 +100,7 @@ export default function EditForm({ open, setOpen, id }: IEditForm) {
           </Toolbar>
         </AppBar>
         <List>
-          <Controller name='title' control={control} render={({ field }) =>
+        <Controller name='title' control={control} render={({ field }) =>
             <ListItem>
               <FormControl fullWidth sx={{ m: 1 }}>
                 <InputLabel htmlFor="outlined-adornment-amount">Название</InputLabel>
@@ -185,6 +169,6 @@ export default function EditForm({ open, setOpen, id }: IEditForm) {
           )}
         </List>
       </Dialog>
-    </>
+    </form>
   );
 }

@@ -1,20 +1,20 @@
-import React from 'react';
 import { Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { limitText } from '../../utils/limit';
+import { useAppSelector } from '../../hooks/redux';
 
 interface IVideoCard {
   title: string;
-  text: string;
   img: string;
   id: number;
   saveFunction: (id: number) => void;
   deleteFunction: (id: number) => void
-  isLike?: boolean;
 }
 
 
-export default function VideoCard({ img, text, title, id, saveFunction, deleteFunction, isLike = false }: IVideoCard) {
+export default function VideoCard({ img, title, id, saveFunction, deleteFunction }: IVideoCard) {
+  const { isAuth } = useAppSelector(state => state.user)
+  const { likeList } = useAppSelector(state => state.likes)
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardActionArea>
@@ -29,9 +29,6 @@ export default function VideoCard({ img, text, title, id, saveFunction, deleteFu
           <Typography gutterBottom variant="h5" component="h2">
             {title}
           </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
-            {limitText(text, 0, 30)}
-          </Typography>
         </CardContent>
       </CardActionArea>
       <CardActions>
@@ -40,14 +37,14 @@ export default function VideoCard({ img, text, title, id, saveFunction, deleteFu
           <Link to={'/video/' + id}>Подробнее</Link>
         </Button>
 
-        {isLike ?
+        {isAuth && likeList && (!likeList.includes(id) ?
           <Button size="small" color="primary" onClick={() => saveFunction(id)}>
             Сохранить
           </Button>
           :
           <Button size="small" color="primary" onClick={() => deleteFunction(id)}>
             Удалить
-          </Button>}
+          </Button>)}
 
       </CardActions>
     </Card>

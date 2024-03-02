@@ -1,10 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
 import userSlice from './reducers/userSlice'
+import VideoSlice from './reducers/VideoSlice'
+import LikesSlice from './reducers/LikesSlice'
 
 export const store = configureStore({
   reducer: {
-    user: userSlice
+    user: userSlice,
+    video: VideoSlice,
+    likes: LikesSlice
   },
 })
 

@@ -1,4 +1,4 @@
-import { IVideo } from "../interfaces/Video"
+import { IVideo, IVideoFromSB } from "../interfaces/Video"
 import supabase from "../supabase/supabase"
 
 class VideoApi {
@@ -9,7 +9,7 @@ class VideoApi {
       .select('*')
 
     if (error) throw new Error(error.message)
-    return data
+    return data as IVideoFromSB[]
   }
 
   async getVideoPost(id: number) {
@@ -21,8 +21,16 @@ class VideoApi {
       .single()
 
     if (error) throw new Error(error.message)
-    return data
+    return data as IVideoFromSB
   }
+
+  async getVideoPostArray(ids: number[]) {
+    const { data, error } = await supabase.rpc('get_like_videos', { ids })
+
+    if (error) throw new Error(error.message)
+    return data as IVideoFromSB[]
+  }
+
 
   async deleteVideoPost(id: number) {
     const { error } = await supabase
@@ -42,18 +50,18 @@ class VideoApi {
       .select()
 
     if (error) throw new Error(error.message)
-    return data
+    return data as unknown as IVideoFromSB
   }
 
-  async updateVideoPost({ details, img, title, videoLink }: IVideo, userId: string, videoId: number) {
+  async updateVideoPost({ details, img, title, videoLink }: IVideo, videoId: number) {
     const { data, error } = await supabase
       .from('Video')
-      .update({ title, videoLink, img, details, user_id: userId })
+      .update({ title, videoLink, img, details })
       .eq('id', videoId)
       .select()
 
     if (error) throw new Error(error.message)
-    return data
+    return data as unknown as IVideoFromSB
   }
 }
 

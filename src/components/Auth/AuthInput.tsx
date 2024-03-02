@@ -1,9 +1,10 @@
 import { Box, TextField, Button } from '@mui/material'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import User from '../../API/User'
 import { useAppDispatch } from '../../hooks/redux'
 import { userSlice } from '../../store/reducers/userSlice'
 import { useNavigate } from 'react-router-dom'
+import { createUserLikeList } from '../../store/actions/LikesActions'
 
 const AuthInput = () => {
   const navigate = useNavigate()
@@ -24,6 +25,11 @@ const AuthInput = () => {
 
   const signIn = async (): Promise<void> => {
     const user = signType === 'in' ? await User.signin(email, password) : await User.signup(email, password)
+
+    if (signType === 'up' && user) {
+      dispatch(createUserLikeList(user.id))
+    }
+
     if (user) {
       dispatch(setUserInfo({ email: user?.email ?? '', id: user.id, isAuth: true }))
       navigate('/')

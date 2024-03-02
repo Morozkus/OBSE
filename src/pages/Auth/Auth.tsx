@@ -1,4 +1,3 @@
-import React from 'react'
 import AuthInput from '../../components/Auth/AuthInput'
 import { Box } from '@mui/material'
 
